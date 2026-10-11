@@ -106,17 +106,18 @@
   .btn.ghost { background: linear-gradient(#1f8a7e, #12635c); color: #fff; box-shadow: 0 5px 0 #062a28, 0 10px 20px rgba(0, 0, 0, .4); }
   /* ---------- mobile app only (html.app is set by the iOS wrapper): one rule for every pop-up.
      Buttons are the same height, full width, stacked with one gap; a pair of secondary actions shares a row; every button keeps the same ledge shadow in its own tone. */
-  html.app .btn { --ledge: #a85d00; line-height: 1.2; text-decoration: none !important; box-shadow: 0 5px 0 var(--ledge), 0 10px 20px rgba(0, 0, 0, .4); }
-  html.app .btn:active { box-shadow: 0 2px 0 var(--ledge); }
-  html.app .btn.ghost { --ledge: #062a28; }
-  html.app .btn[data-arcade-share] { --ledge: #3a3a46; background: #0b0b12 !important; color: #fff !important; border: 0 !important; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .85), 0 5px 0 var(--ledge), 0 10px 20px rgba(0, 0, 0, .4); }
-  html.app .btn[data-arcade-share]:active { box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .85), 0 2px 0 var(--ledge); }
+  html.app .btn { line-height: 1.2; text-decoration: none !important; }
+  /* pop-up buttons in the app are flat: no ledge under any of them, one thin inner rim on all, one pressed look */
+  html.app .card .btn { box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .26); border: 0 !important; }
+  html.app .card .btn:active { translate: 0 1px; filter: brightness(.9); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .26); }
+  html.app .btn[data-arcade-share] { background: #0b0b12 !important; color: #fff !important; }
   html.app .modal { padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); }
-  html.app .card { padding: 26px 24px 31px; max-height: calc(100dvh - 32px); overflow-y: auto; }
+  html.app .card { padding: 26px 24px 26px; max-height: calc(100dvh - 32px); overflow-y: auto; }
   html.app .card .btn { display: flex !important; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; width: 100%; min-height: 52px; margin: 12px 0 0; padding: 12px 16px; white-space: nowrap; }
   html.app .card .btn[hidden], html.app .card a[href="../games/"] { display: none !important; }
-  html.app .card p + .btn, html.app .card .goalrow + .btn, html.app .card .days + .btn { margin-top: 6px; }
-  html.app #eBtns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
+  html.app .card p + .btn, html.app .card .goalrow + .btn, html.app .card .days + .btn { margin-top: 2px; }
+  html.app #eBtns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  html.app #mEnd [data-arcade-roast] { margin: 0; }
   html.app #eBtns .btn { margin: 0; }
   html.app #eBtns .btn:first-child, html.app #eBtns .btn:last-child:nth-child(even) { grid-column: 1 / -1; }
   /* game screen in the app: pause alone top-left with the two progress bars beside it, then three equal metric boxes, then the board */

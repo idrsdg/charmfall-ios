@@ -31,11 +31,27 @@ struct GameView: UIViewRepresentable {
         config.mediaTypesRequiringUserActionForPlayback = []
         let content = config.userContentController
         content.add(context.coordinator, name: "haptic")
+        #if DEBUG
+        content.add(context.coordinator, name: "log")
+        #endif
         // The web build buzzes with navigator.vibrate, which iOS does not have: route it to the Taptic Engine.
         // Links back to the web arcade make no sense inside the app, so they are hidden.
         let boot = """
         navigator.vibrate = function (p) { try { webkit.messageHandlers.haptic.postMessage(Array.isArray(p) ? p.reduce(function (a, b) { return a + b; }, 0) : (p || 0)); } catch (e) {} return true; };
         window.__nativeApp = true;
+        // Sound: keep a list of every audio context the game makes, ask iOS for the "playback" route so the ring switch
+        // does not silence the game, and wake any context that is not running on every touch.
+        (function () {
+          var Base = window.AudioContext || window.webkitAudioContext; if (!Base) return;
+          var all = window.__ctxs = [];
+          var Tracked = class extends Base { constructor(o) { super(o); all.push(this); } };
+          window.AudioContext = Tracked; if (window.webkitAudioContext) window.webkitAudioContext = Tracked;
+          try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+          var wake = function () { all.forEach(function (c) { if (c.state !== 'running') { try { c.resume(); } catch (e) {} } }); };
+          ['touchstart', 'touchend', 'pointerup', 'click'].forEach(function (t) { addEventListener(t, wake, true); });
+          document.addEventListener('visibilitychange', function () { if (!document.hidden) setTimeout(wake, 150); });
+          window.__wake = wake;
+        })();
         if (document.documentElement) document.documentElement.classList.add('app');
         document.addEventListener('DOMContentLoaded', function () {
           document.documentElement.classList.add('app');
@@ -44,6 +60,7 @@ struct GameView: UIViewRepresentable {
           document.head.appendChild(s);
           var logo = document.querySelector('.logo'); if (logo) logo.innerHTML = 'Charm<span>fall</span>';
           document.title = 'Charmfall';
+          if (webkit.messageHandlers.log) setTimeout(function () { try { SFX.swap(); window.__wake(); } catch (e) {} setTimeout(function () { webkit.messageHandlers.log.postMessage('ctx=' + (window.__ctxs || []).map(function (c) { return c.state + '@' + c.sampleRate + ' t=' + c.currentTime.toFixed(2); }).join('|') + ' session=' + (navigator.audioSession ? navigator.audioSession.type : 'none') + ' sound=' + (window.save ? '' : '') + localStorage.getItem('arcade.volume')); }, 1500); }, 2500);
         });
         """
         content.addUserScript(WKUserScript(source: boot, injectionTime: .atDocumentStart, forMainFrameOnly: true))
@@ -72,6 +89,7 @@ struct GameView: UIViewRepresentable {
         private let heavy = UIImpactFeedbackGenerator(style: .heavy)
 
         func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
+            if message.name == "log" { NSLog("CHARMLOG %@", String(describing: message.body)); return }
             let ms = (message.body as? NSNumber)?.doubleValue ?? 0
             (ms >= 30 ? heavy : light).impactOccurred()
         }
