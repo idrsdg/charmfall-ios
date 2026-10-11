@@ -132,7 +132,7 @@
   html.app .hud .goal b { font-size: 19px; }
   html.app #boardWrap { grid-column: 1 / -1; grid-row: 4; min-height: 0; padding: 14px 0 6px; margin: 0 -14px; }
   html.app .boosters { grid-column: 1 / -1; grid-row: 5; }
-  /* map in the app: sound and vibration live in a small column under the top bar */
+  /* map in the app: the sound switch sits under the top bar */
   .mapset { display: none; }
   html.app .mapset { display: flex; flex-direction: column; gap: 10px; position: fixed; right: 12px; top: calc(max(14px, env(safe-area-inset-top)) + 54px); z-index: 2; }
   html.app .mapset button { width: 46px; height: 46px; padding: 0; justify-content: center; font: inherit; font-size: 20px; color: #fff; border-color: #ffd76a; cursor: pointer; }
@@ -195,7 +195,7 @@
     <div style="display:flex;gap:8px"><span class="pill">❤️ <span id="lives">5</span></span><span class="pill">⭐ <span id="starsTotal">0</span></span><span class="pill snd" style="border-color:#22e65a;cursor:pointer">🔊</span><a class="pill" href="../games/" style="color:#fff;text-decoration:none;border-color:#7df0d0;box-shadow:0 3px 0 #04201f">🎮</a></div>
   </div>
   <div class="path" id="path"><svg id="pathSvg" viewBox="0 0 420 1400" preserveAspectRatio="none"></svg></div>
-  <div class="mapset"><button type="button" class="pill" id="setSound" title="Sound"><span>🔊</span></button><button type="button" class="pill" id="setVib" title="Vibration"><span>📳</span></button></div>
+  <div class="mapset"><button type="button" class="pill" id="setSound" title="Sound"><span>🔊</span></button></div>
   <div class="mapbar"><button type="button" id="btnDaily">🎁 Daily gift</button><button type="button" id="btnAch">🏆 Awards <span id="achN"></span></button></div>
 </section>
 
@@ -624,10 +624,9 @@ function resumeGame() { if (!G || !G.paused) return; hide("mPause"); G.paused = 
 $("btnPause").addEventListener("click", pauseGame);
 function renderSound() { document.querySelectorAll(".snd").forEach(el => { el.textContent = (save.sound === false ? "🔇" : "🔊") + (el.classList.contains("btn") ? (save.sound === false ? " Sound off" : " Sound on") : ""); }); }
 function toggleSound() { save.sound = save.sound === false; persist(); renderSound(); if (save.sound !== false) SFX.swap(); }
-function renderSettings() { const so = save.sound !== false, vo = save.vib !== false; $("setSound").classList.toggle("off", !so); $("setSound").firstChild.textContent = so ? "🔊" : "🔇"; $("setVib").classList.toggle("off", !vo); $("setVib").firstChild.textContent = vo ? "📳" : "📴"; }
-const buzz = (p) => { if (save.vib !== false && navigator.vibrate) navigator.vibrate(p); };
+function renderSettings() { const so = save.sound !== false; $("setSound").classList.toggle("off", !so); $("setSound").firstChild.textContent = so ? "🔊" : "🔇"; }
+const buzz = (p) => { if (navigator.vibrate) navigator.vibrate(p); };
 $("setSound").addEventListener("click", () => { toggleSound(); renderSettings(); });
-$("setVib").addEventListener("click", () => { save.vib = save.vib === false; persist(); renderSettings(); buzz(40); });
 if (window.__nativeApp) $("pMap").textContent = "Exit to map";
 document.querySelectorAll(".snd").forEach(el => el.addEventListener("click", toggleSound)); renderSound(); renderSettings();
 addEventListener("keydown", e => { if (e.key === "m" || e.key === "M") toggleSound(); });

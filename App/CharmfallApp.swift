@@ -1,8 +1,15 @@
 import SwiftUI
 import WebKit
+import AVFoundation
 
 @main
 struct CharmfallApp: App {
+    init() {
+        // Game sound plays even when the ring switch is on silent, and does not stop the player's own music.
+        try? AVAudioSession.sharedInstance().setCategory(.playback, options: [.mixWithOthers])
+        try? AVAudioSession.sharedInstance().setActive(true)
+    }
+
     var body: some Scene {
         WindowGroup {
             GameView()
