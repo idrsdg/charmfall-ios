@@ -14,7 +14,7 @@ struct CharmfallApp: App {
         WindowGroup {
             GameView()
                 .ignoresSafeArea()
-                .background(Color(red: 4 / 255, green: 26 / 255, blue: 28 / 255))
+                .background(Color(red: 6 / 255, green: 10 / 255, blue: 34 / 255))
                 .statusBarHidden(true)
                 .persistentSystemOverlays(.hidden)
         }
@@ -39,6 +39,8 @@ struct GameView: UIViewRepresentable {
         let boot = """
         navigator.vibrate = function (p) { try { webkit.messageHandlers.haptic.postMessage(Array.isArray(p) ? p.reduce(function (a, b) { return a + b; }, 0) : (p || 0)); } catch (e) {} return true; };
         window.__nativeApp = true;
+        // One-time courtesy refill of lives (asked for on 2026-10-12): runs once per install, before the game reads its save.
+        try { if (!localStorage.getItem('charm.refill1')) { var sv = JSON.parse(localStorage.getItem('prismpop.v1') || 'null'); if (sv) { sv.lives = 5; sv.lifeAt = Date.now(); localStorage.setItem('prismpop.v1', JSON.stringify(sv)); } localStorage.setItem('charm.refill1', '1'); } } catch (e) {}
         // Sound: keep a list of every audio context the game makes, ask iOS for the "playback" route so the ring switch
         // does not silence the game, and wake any context that is not running on every touch.
         (function () {
@@ -68,7 +70,7 @@ struct GameView: UIViewRepresentable {
         let web = WKWebView(frame: .zero, configuration: config)
         web.navigationDelegate = context.coordinator
         web.isOpaque = false
-        web.backgroundColor = UIColor(red: 4 / 255, green: 26 / 255, blue: 28 / 255, alpha: 1)
+        web.backgroundColor = UIColor(red: 6 / 255, green: 10 / 255, blue: 34 / 255, alpha: 1)
         web.scrollView.backgroundColor = web.backgroundColor
         web.scrollView.bounces = false
         web.scrollView.contentInsetAdjustmentBehavior = .never
