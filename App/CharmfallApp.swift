@@ -7,7 +7,7 @@ struct CharmfallApp: App {
         WindowGroup {
             GameView()
                 .ignoresSafeArea()
-                .background(Color(red: 7 / 255, green: 6 / 255, blue: 28 / 255))
+                .background(Color(red: 4 / 255, green: 26 / 255, blue: 28 / 255))
                 .statusBarHidden(true)
                 .persistentSystemOverlays(.hidden)
         }
@@ -29,7 +29,9 @@ struct GameView: UIViewRepresentable {
         let boot = """
         navigator.vibrate = function (p) { try { webkit.messageHandlers.haptic.postMessage(Array.isArray(p) ? p.reduce(function (a, b) { return a + b; }, 0) : (p || 0)); } catch (e) {} return true; };
         window.__nativeApp = true;
+        if (document.documentElement) document.documentElement.classList.add('app');
         document.addEventListener('DOMContentLoaded', function () {
+          document.documentElement.classList.add('app');
           var s = document.createElement('style');
           s.textContent = 'a[href="../games/"]{display:none!important} body{-webkit-touch-callout:none}';
           document.head.appendChild(s);
@@ -42,7 +44,7 @@ struct GameView: UIViewRepresentable {
         let web = WKWebView(frame: .zero, configuration: config)
         web.navigationDelegate = context.coordinator
         web.isOpaque = false
-        web.backgroundColor = UIColor(red: 7 / 255, green: 6 / 255, blue: 28 / 255, alpha: 1)
+        web.backgroundColor = UIColor(red: 4 / 255, green: 26 / 255, blue: 28 / 255, alpha: 1)
         web.scrollView.backgroundColor = web.backgroundColor
         web.scrollView.bounces = false
         web.scrollView.contentInsetAdjustmentBehavior = .never
