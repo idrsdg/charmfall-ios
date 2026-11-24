@@ -17,6 +17,17 @@ struct CharmfallApp: App {
                 .background(Color(red: 28 / 255, green: 94 / 255, blue: 52 / 255))   // the game's own forest green (#1c5e34), the same as the launch screen
                 .statusBarHidden(true)
                 .persistentSystemOverlays(.hidden)
+                .onAppear {
+                    #if targetEnvironment(macCatalyst)
+                    // On the Mac the game opens in a phone-shaped window (the app uses the phone layout) and cannot be dragged into a shape the layout was not made for.
+                    for case let scene as UIWindowScene in UIApplication.shared.connectedScenes {
+                        scene.sizeRestrictions?.minimumSize = CGSize(width: 420, height: 860)
+                        scene.sizeRestrictions?.maximumSize = CGSize(width: 520, height: 1060)
+                        scene.title = "Charmfall"
+                        if let tb = scene.titlebar { tb.titleVisibility = .hidden; tb.toolbar = nil }
+                    }
+                    #endif
+                }
         }
     }
 }
